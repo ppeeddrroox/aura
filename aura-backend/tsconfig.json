@@ -1,0 +1,16 @@
+// aura-backend/tsconfig.json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "Node16",                   // obligatorio para compatibilidad con ESM en Node 16+
+    "moduleResolution": "Node16",
+    "outDir": "build",
+    "rootDir": "src",
+    "strict": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+  },
+  "include": ["src"]
+}
+

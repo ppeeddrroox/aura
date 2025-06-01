@@ -1,0 +1,26 @@
+# docker-compose.yml
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=aura       # <<< Agrega esta línea
+    networks:
+      - aura
+
+  aura-backend:
+    build: ./aura-backend
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "4000:4000"
+    networks:
+      - aura
+    depends_on:
+      - postgres
+
+networks:
+  aura:
+

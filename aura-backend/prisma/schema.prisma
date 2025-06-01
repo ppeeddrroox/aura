@@ -1,0 +1,57 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String    @unique
+  password  String
+  role      Role      @default(viewer)
+  createdAt DateTime  @default(now())
+  devices   Device[]
+}
+
+model Device {
+  id           String        @id @default(uuid())
+  code         String        @unique
+  name         String?       // alias opcional
+  description  String?       // nueva descripción
+  location     String?       // nueva ubicación
+  registered   Boolean       @default(false)
+  owner        User?         @relation(fields: [ownerId], references: [id])
+  ownerId      Int?
+  measurements Measurement[]
+  dataPoints   DataPoint[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Measurement {
+  id         Int      @id @default(autoincrement())
+  deviceId   String
+  device     Device   @relation(fields: [deviceId], references: [id])
+  value      Float
+  roomState  String
+  timestamp  DateTime @default(now())
+}
+
+model DataPoint {
+  id         Int      @id @default(autoincrement())
+  device     Device   @relation(fields: [deviceId], references: [id])
+  deviceId   String
+  emotion    String
+  value      Float
+  timestamp  DateTime @default(now())
+}
+
+enum Role {
+  owner
+  admin
+  viewer
+}
