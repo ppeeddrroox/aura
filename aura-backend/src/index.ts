@@ -53,6 +53,10 @@ io.on("connection", (socket: Socket) => {
 app.post("/api/devices/data", async (req, res) => {
   // deviceId es en realidad el código público (p.ej. "AURA-ABC002")
   const { code, measurement, roomState } = req.body;
+  
+  // Normalizar estados con tildes
+  const normalizedRoomState = normalizeRoomState(roomState);
+  
   try {
     const device = await prisma.device.findUnique({
       where: { code }            // AURA-ABC002 se busca en code
@@ -66,7 +70,7 @@ app.post("/api/devices/data", async (req, res) => {
       data: {
         deviceId: device.id,
         value: measurement,
-        roomState,
+        roomState: normalizedRoomState,  // Usamos el estado normalizado
         timestamp: new Date()
       }
     });
@@ -78,6 +82,20 @@ app.post("/api/devices/data", async (req, res) => {
     return res.status(500).json({ status: "error" });
   }
 });
+
+// Función para normalizar estados emocionales (añadir tildes)
+function normalizeRoomState(state: string): string {
+  const stateMap: Record<string, string> = {
+    "Energia": "Energía",
+    "Estres": "Estrés",
+    "Monotonia": "Monotonía",
+    "Distraccion": "Distracción",
+    "Expectacion": "Expectación"
+  };
+  
+  // Devolver el estado normalizado o el original si no hay coincidencia
+  return stateMap[state] || state;
+}
 
 // Rutas de autenticación
 app.use("/auth", authRoutes);
